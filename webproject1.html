@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyMind | Track cognitive load & prevent burnout</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #f8fafc;
+            color: #0f172a;
+        }
+
+        /* landing page - hero */
+        .hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            padding: 80px 24px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #a5f3fc, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #94a3b8;
+            max-width: 600px;
+            margin: 0 auto 32px;
+        }
+
+        .btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 100px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 10px 20px -5px rgba(59,130,246,0.5);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .btn.secondary {
+            background: #1e293b;
+            box-shadow: none;
+            border: 1px solid #334155;
+        }
+
+        .btn.secondary:hover {
+            background: #2d3a4f;
+        }
+
+        /* features */
+        .features {
+            padding: 80px 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 48px;
+            text-align: center;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 32px 24px;
+            border-radius: 32px;
+            box-shadow: 0 20px 30px -10px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .feature-card:hover {
+            transform: scale(1.02);
+        }
+
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* why matters */
+        .why-matters {
+            background: #f1f5f9;
+            padding: 80px 24px;
+        }
+
+        .why-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: center;
+        }
+
+        .why-text h2 {
+            font-size: 32px;
+            margin-bottom: 24px;
+        }
+
+        .why-text ul {
+            list-style: none;
+        }
+
+        .why-text li {
+            margin-bottom: 16px;
+            padding-left: 28px;
+            position: relative;
+            color: #334155;
+        }
+
+        .why-text li::before {
+            content: "⚡";
+            position: absolute;
+            left: 0;
+        }
+
+        .why-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .stat-bubble {
+            background: white;
+            padding: 32px;
+            border-radius: 40px;
+            text-align: center;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+
+        /* dashboard layout */
+        .dashboard-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 32px 24px;
+            background: #f8fafc;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 16px;
+        }
+
+        .nav-link {
+            padding: 10px 20px;
+            border-radius: 100px;
+            background: white;
+            color: #0f172a;
+            text-decoration: none;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .nav-link.active {
+            background: #3b82f6;
+            color: white;
+        }
+
+        /* summary cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 28px;
+            padding: 24px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.02);
+            border: 1px solid #e2e8f0;
+            backdrop-filter: blur(10px);
+        }
+
+        .summary-label {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .summary-value {
+            font-size: 36px;
+            font-weight: 700;
+        }
+
+        .summary-unit {
+            font-size: 14px;
+            color: #64748b;
+            margin-left: 4px;
+        }
+
+        .load-meter {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 100px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+
+        .load-fill {
+            height: 100%;
+            width: 68%;
+            background: linear-gradient(90deg, #3b82f6, #a855f7);
+            border-radius: 100px;
+        }
+
+        /* charts row */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 28px;
+            padding: 24px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 6px;
+        }
+
+        .heatmap-cell {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: #334155;
+        }
+
+        .heatmap-cell.high {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .heatmap-cell.medium {
+            background: #fed7aa;
+            color: #92400e;
+        }
+
+        .heatmap-cell.low {
+            background: #bfdbfe;
+            color: #1e40af;
+        }
+
+        /* insights panel */
+        .insights-panel {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            border-radius: 28px;
+            padding: 28px;
+            color: white;
+            margin-bottom: 32px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .insight-item {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .insight-icon {
+            font-size: 28px;
+        }
+
+        .insight-text {
+            font-size: 15px;
+            opacity: 0.9;
+        }
+
+        /* task form */
+        .form-card {
+            background: white;
+            border-radius: 32px;
+            padding: 32px;
+            max-width: 600px;
+            margin: 0 auto;
+            border: 1px solid #e2e8f0;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            font-size: 16px;
+            background: #f8fafc;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .badge {
+            background: #3b82f6;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 12px;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .streak-badge {
+            background: #f59e0b;
+            padding: 8px 16px;
+            border-radius: 100px;
+            color: white;
+            font-weight: 500;
+        }
+
+        /* gamification */
+        .gami-row {
+            display: flex;
+            gap: 20px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .badge-card {
+            background: white;
+            border-radius: 20px;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid #e2e8f0;
+            flex: 1;
+        }
+
+        /* responsive */
+        @media (max-width: 900px) {
+            .feature-grid, .summary-grid, .charts-row, .insights-panel {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .why-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .feature-grid, .summary-grid, .charts-row, .insights-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ========== LANDING PAGE (index.html) ========== -->
+    <section id="landing" style="display: block;">
+        <!-- Hero -->
+        <div class="hero">
+            <h1>Track Your Study Load.<br>Avoid Mental Burnout.</h1>
+            <p>Monitor cognitive load and prevent decision fatigue during exam preparation. Real-time insights for smarter studying.</p>
+            <a href="#dashboard" onclick="showDashboard()" class="btn">🚀 Start Tracking</a>
+        </div>
+
+        <!-- Features -->
+        <div class="features">
+            <h2 class="section-title">Everything you need to stay focused</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🧠</div>
+                    <h3>Cognitive Load Meter</h3>
+                    <p>Real-time 0–100 load score based on difficulty, time & switches</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Study Analytics</h3>
+                    <p>Subject difficulty, focus trends, and heatmap of stressful hours</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Task Switch Tracker</h3>
+                    <p>Count subject switches & calculate context-switching cost</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚠️</div>
+                    <h3>Fatigue Alerts</h3>
+                    <p>Get notified when load >75% and break recommendations</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Why it matters -->
+        <div class="why-matters">
+            <div class="why-container">
+                <div class="why-text">
+                    <h2>Why students burn out</h2>
+                    <ul>
+                        <li>Students overload their brains with back-to-back subjects</li>
+                        <li>Frequent switching increases mental fatigue by 40%</li>
+                        <li>Poor decisions happen when cognitive load is high</li>
+                        <li>Our system helps you study smarter, not harder</li>
+                    </ul>
+                </div>
+                <div class="why-stats">
+                    <div class="stat-bubble">
+                        <div class="stat-number">78%</div>
+                        <div>students report mental exhaustion</div>
+                    </div>
+                    <div class="stat-bubble">
+                        <div class="stat-number">2.3x</div>
+                        <div>more focus with load management</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== DASHBOARD PAGE (hidden initially) ========== -->
+    <section id="dashboard" style="display: none;">
+        <div class="dashboard-container">
+            <!-- header + nav -->
+            <div class="dashboard-header">
+                <h1 style="font-size: 28px;">📊 Study Dashboard</h1>
+                <div class="nav-links">
+                    <a href="#" class="nav-link active" onclick="showDashboard(); return false;">Dashboard</a>
+                    <a href="#" class="nav-link" onclick="showTaskForm(); return false;">➕ Add Task</a>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="summary-label">🧠 Load Score</div>
+                    <div class="summary-value" id="loadScore">68<span class="summary-unit">/100</span></div>
+                    <div class="load-meter"><div class="load-fill" id="loadFill" style="width: 68%;"></div></div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">⏳ Study Time</div>
+                    <div class="summary-value" id="studyTime">4.2<span class="summary-unit">hrs</span></div>
+                    <div style="color:#64748b; font-size:14px; margin-top:8px;">today</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">🔄 Task Switches</div>
+                    <div class="summary-value" id="switchCount">18</div>
+                    <div style="color:#ef4444; font-size:14px;">↑ +6 from avg</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">⚠️ Fatigue Level</div>
+                    <div class="summary-value" id="fatigueLevel">Medium</div>
+                    <div class="load-meter"><div class="load-fill" style="width:65%; background:#f59e0b;"></div></div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="charts-row">
+                <!-- line chart -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <span>📈 Cognitive load over time</span>
+                        <span class="badge">last 7 days</span>
+                    </div>
+                    <canvas id="loadChart" style="width:100%; height:180px;"></canvas>
+                </div>
+                <!-- heatmap placeholder -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <span>🔥 Stressful hours</span>
+                        <span class="badge">today</span>
+                    </div>
+                    <div class="heatmap-grid">
+                        <div class="heatmap-cell low">9a</div>
+                        <div class="heatmap-cell low">10a</div>
+                        <div class="heatmap-cell medium">11a</div>
+                        <div class="heatmap-cell high">12p</div>
+                        <div class="heatmap-cell high">1p</div>
+                        <div class="heatmap-cell high">2p</div>
+                        <div class="heatmap-cell medium">3p</div>
+                        <div class="heatmap-cell medium">4p</div>
+                        <div class="heatmap-cell low">5p</div>
+                        <div class="heatmap-cell low">6p</div>
+                        <div class="heatmap-cell low">7p</div>
+                        <div class="heatmap-cell">8p</div>
+                    </div>
+                    <p style="margin-top:16px; color:#475569; font-size:13px;">🔴 high load · 🟡 medium · 🔵 low</p>
+                </div>
+            </div>
+
+            <!-- Insights Panel -->
+            <div class="insights-panel">
+                <div class="insight-item">
+                    <div class="insight-icon">🔄</div>
+                    <div class="insight-text">You switched subjects <strong>18 times</strong> today</div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-icon">🌙</div>
+                    <div class="insight-text">Peak cognitive load at <strong>6 PM</strong></div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-icon">⚠️</div>
+                    <div class="insight-text">High fatigue risk detected · break recommended</div>
+                </div>
+            </div>
+
+            <!-- Gamification + special metrics -->
+            <div style="display: flex; gap:20px; flex-wrap: wrap; margin-bottom:20px;">
+                <div class="badge-card">
+                    <span style="font-size:32px;">🎯</span>
+                    <div>
+                        <div style="font-weight:600;">Decision density</div>
+                        <div style="font-size:24px; font-weight:700;">43 <span style="font-size:14px; color:#64748b;">academic decisions</span></div>
+                    </div>
+                </div>
+                <div class="badge-card">
+                    <span style="font-size:32px;">⚡</span>
+                    <div>
+                        <div style="font-weight:600;">Focus stability</div>
+                        <div style="font-size:24px; font-weight:700;">74<span style="font-size:14px; color:#64748b;">/100</span></div>
+                    </div>
+                </div>
+                <div class="badge-card">
+                    <span style="font-size:32px;">🏆</span>
+                    <div>
+                        <div style="font-weight:600;">3-day streak</div>
+                        <div style="color:#f59e0b;">🔥 Deep focus badge</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Best focus hour -->
+            <div style="background:#dbeafe; border-radius:24px; padding:20px; margin-top:16px; border:1px solid #bfdbfe;">
+                ⏰ <strong>Your best study time:</strong> 9 AM – 11 AM (lowest cognitive load, highest performance)
+            </div>
+
+            <!-- Break popup simulation (hidden by default, shown when load>75) -->
+            <div id="breakPopup" style="display:none; background:#ef4444; color:white; padding:20px; border-radius:24px; margin-top:24px; text-align:center;">
+                😴 Take a 10-minute break. Your mental load is high (78%)
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== TASK INPUT PAGE ========== -->
+    <section id="taskForm" style="display: none;">
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <h1>📝 Log study session</h1>
+                <div class="nav-links">
+                    <a href="#" class="nav-link" onclick="showDashboard(); return false;">Dashboard</a>
+                    <a href="#" class="nav-link active" onclick="showTaskForm(); return false;">➕ Add Task</a>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <div class="form-group">
+                    <label class="form-label">Subject name</label>
+                    <input class="form-input" type="text" placeholder="e.g. Mathematics, Physics" id="subjectName">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Duration (min)</label>
+                        <input class="form-input" type="number" value="60" id="duration">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Difficulty (1-5)</label>
+                        <input class="form-input" type="number" min="1" max="5" value="3" id="difficulty">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Decision intensity</label>
+                    <select class="form-input" id="intensity">
+                        <option>Low</option>
+                        <option selected>Medium</option>
+                        <option>High</option>
+                    </select>
+                </div>
+                <button class="btn" style="width:100%;" onclick="addStudySession()">➕ Add session & update dashboard</button>
+                <p style="margin-top:16px; color:#64748b; font-size:13px; text-align:center;">This will update load score, graph and insights</p>
+            </div>
+
+            <!-- daily report generator -->
+            <div style="background:white; border-radius:32px; padding:28px; margin-top:32px; border:1px solid #e2e8f0;">
+                <h3 style="margin-bottom:20px;">📋 Today's report (generated)</h3>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                    <div><span style="color:#475569;">Total study time:</span> <strong>4.2h</strong></div>
+                    <div><span style="color:#475569;">Peak load:</span> <strong>82% at 6pm</strong></div>
+                    <div><span style="color:#475569;">Suggested improvement:</span> <strong>avoid switching during math</strong></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // simple navigation
+        function showDashboard() {
+            document.getElementById('landing').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('taskForm').style.display = 'none';
+            initChart(); 
+            checkBreakPopup();
+        }
+
+        function showTaskForm() {
+            document.getElementById('landing').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('taskForm').style.display = 'block';
+        }
+
+        // initial: show landing
+        document.getElementById('landing').style.display = 'block';
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('taskForm').style.display = 'none';
+
+        // chart initialization
+        let loadChart;
+        function initChart() {
+            const ctx = document.getElementById('loadChart')?.getContext('2d');
+            if (!ctx) return;
+            if (loadChart) loadChart.destroy();
+            loadChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'cognitive load',
+                        data: [45, 58, 62, 48, 72, 68, 55],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59,130,246,0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        // break popup when load > 75
+        function checkBreakPopup() {
+            const load = parseInt(document.getElementById('loadScore')?.innerText) || 68;
+            const popup = document.getElementById('breakPopup');
+            if (load > 75) {
+                popup.style.display = 'block';
+            } else {
+                popup.style.display = 'none';
+            }
+        }
+
+        // simulate adding session
+        function addStudySession() {
+            const subject = document.getElementById('subjectName')?.value || 'Unknown';
+            const duration = parseInt(document.getElementById('duration')?.value) || 60;
+            const difficulty = parseInt(document.getElementById('difficulty')?.value) || 3;
+            const intensity = document.getElementById('intensity')?.value || 'Medium';
+
+            // update dashboard values (simulated)
+            document.getElementById('loadScore').innerHTML = '78<span class="summary-unit">/100</span>';
+            document.getElementById('loadFill').style.width = '78%';
+            document.getElementById('studyTime').innerHTML = '5.1<span class="summary-unit">hrs</span>';
+            document.getElementById('switchCount').innerText = '22';
+            document.getElementById('fatigueLevel').innerText = 'High';
+            
+            // update chart data (push new)
+            if (loadChart) {
+                const newData = [48, 62, 71, 55, 78, 68, 72];
+                loadChart.data.datasets[0].data = newData;
+                loadChart.update();
+            }
+
+            // update heatmap cell (just demo)
+            // show insights update
+            document.querySelector('.insights-panel').innerHTML = `
+                <div class="insight-item"><div class="insight-icon">📘</div><div class="insight-text">Added ${subject} · ${duration}min · difficulty ${difficulty}</div></div>
+                <div class="insight-item"><div class="insight-icon">⚠️</div><div class="insight-text">Load now 78% · take a break</div></div>
+                <div class="insight-item"><div class="insight-icon">🎯</div><div class="insight-text">Decision density: 51 today</div></div>
+            `;
+
+            // show break popup
+            document.getElementById('breakPopup').style.display = 'block';
+            
+            // go to dashboard
+            showDashboard();
+        }
+
+        // best focus hour detection (demo)
+        // decision density & focus stability are hardcoded in UI
+        // gamification visible
+
+        // on dashboard show, init chart
+        window.initChart = initChart;
+    </script>
+
+    <!-- small extra: break popup (hidden by default) -->
+    <div style="position:fixed; bottom:24px; right:24px; z-index:1000;" id="globalBreakPopup" style="display:none;"></div>
+</body>
+</html>
